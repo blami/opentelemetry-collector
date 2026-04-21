@@ -144,10 +144,50 @@ type Config struct {
     }
 {{- end }}
 
+{{ define "minimumValidator" -}}
+    {{ $minimum := .Rules.Minimum -}}
+    if {{ template "fieldValue" . }} < {{ $minimum }} {
+        err = errors.Join(err, errors.New("{{ .FieldName }} must not be less than `{{ $minimum }}`"))
+    }
+{{- end }}
+
+{{ define "maximumValidator" -}}
+    {{ $maximum := .Rules.Maximum -}}
+    if {{ template "fieldValue" . }} > {{ $maximum }} {
+        err = errors.Join(err, errors.New("{{ .FieldName }} must not be greater than `{{ $maximum }}`"))
+    }
+{{- end }}
+
+{{ define "exclusiveMinimumValidator" -}}
+    {{ $exclusiveMinimum := .Rules.ExclusiveMinimum -}}
+    if {{ template "fieldValue" . }} <= {{ $exclusiveMinimum }} {
+        err = errors.Join(err, errors.New("{{ .FieldName }} must not be less or equal to `{{ $exclusiveMinimum }}`"))
+    }
+{{- end }}
+
+{{ define "exclusiveMaximumValidator" -}}
+    {{ $exclusiveMaximum := .Rules.ExclusiveMaximum -}}
+    if {{ template "fieldValue" . }} >= {{ $exclusiveMaximum }} {
+        err = errors.Join(err, errors.New("{{ .FieldName }} must not be greater or equal to `{{ $exclusiveMaximum }}`"))
+    }
+{{- end }}
+
+{{ define "multipleOfValidator" -}}
+    {{ $multipleOf := .Rules.MultipleOf -}}
+    if {{ template "fieldValue" . }} % {{ $multipleOf }} == 0 {
+        err = errors.Join(err, errors.New("{{ .FieldName }} must be multiple of `{{ $multipleOf }}`"))
+    }
+{{- end }}
+
 {{ define "valueValidators" }}
     {{ if .Rules.MaxLength }}{{ template "maxLengthValidator" . }}{{ end }}
     {{ if .Rules.MinLength }}{{ template "minLengthValidator" . }}{{ end }}
     {{ if .Rules.Pattern }}{{ template "patternValidator" . }}{{ end }}
+    {{ if .Rules.Minimum }}{{ template "minimumValidator" . }}{{ end }}
+    {{ if .Rules.Maximum }}{{ template "maximumValidator" . }}{{ end }}
+    {{ if .Rules.ExclusiveMinimum }}{{ template "exclusiveMinimumValidator" . }}{{ end }}
+    {{ if .Rules.ExclusiveMaximum }}{{ template "exclusiveMaximumValidator" . }}{{ end }}
+    {{ if .Rules.MultipleOf }}{{ template "multipleOfValidator" . }}{{ end }}
 {{ end -}}
 
 {{ define "validation" }}

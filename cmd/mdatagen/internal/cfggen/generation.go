@@ -340,10 +340,15 @@ func ExtractValidators(md *ConfigMetadata) []Validator {
 }
 
 type ValidationRules struct {
-	MaxLength *int
-	MinLength *int
-	Pattern   *string
-	Required  bool
+	MaxLength        *int
+	MinLength        *int
+	Pattern          *string
+	Minimum          *float64
+	Maximum          *float64
+	ExclusiveMinimum *float64
+	ExclusiveMaximum *float64
+	MultipleOf       *float64
+	Required         bool
 }
 
 func (vr *ValidationRules) HasValueRule() bool {
@@ -367,8 +372,13 @@ func collectValidators(md *ConfigMetadata, validators *[]Validator) {
 	for _, propName := range slices.Sorted(maps.Keys(md.Properties)) {
 		prop := md.Properties[propName]
 		rules := ValidationRules{
-			MaxLength: prop.MaxLength,
-			MinLength: prop.MinLength,
+			MaxLength:        prop.MaxLength,
+			MinLength:        prop.MinLength,
+			Minimum:          prop.Minimum,
+			Maximum:          prop.Maximum,
+			ExclusiveMinimum: prop.ExclusiveMinimum,
+			ExclusiveMaximum: prop.ExclusiveMaximum,
+			MultipleOf:       prop.MultipleOf,
 		}
 
 		rules.Required = slices.Contains(md.Required, propName)
